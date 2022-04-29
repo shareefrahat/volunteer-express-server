@@ -13,18 +13,35 @@ app.use(express.json());
 
 //------------MongoDB-----------------\\
 
-const uri =
-  "mongodb+srv://<username>:<password>@cluster0.6olzz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6olzz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  console.log("Database Connected: MongoDB");
-  client.close();
-});
+
+async function run() {
+  try {
+    await client.connect();
+    const serviceCollection = client
+      .db("VolunteerExpress")
+      .collection("services");
+
+    //--------------GET : READ----------------\\
+    app.get("/services", async (req, res) => {
+      const query = {};
+      const cursor = await serviceCollection.find(query);
+      result = await cursor.toArray();
+      res.send(result);
+    });
+
+    console.log("DB Connected: MongoDB");
+  } finally {
+    // client.close()
+  }
+}
+
+run().catch(console.dir);
 
 //------------Root API-----------------\\
 
