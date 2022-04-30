@@ -23,6 +23,8 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
+    console.log("DB Connected: MongoDB");
+
     const serviceCollection = client
       .db("VolunteerExpress")
       .collection("services");
@@ -35,7 +37,13 @@ async function run() {
       res.send(result);
     });
 
-    console.log("DB Connected: MongoDB");
+    //--------------POST : CREATE----------------\\
+
+    app.post("/services", async (req, res) => {
+      const newEvent = req.body;
+      const result = await serviceCollection.insertOne(newEvent);
+      res.send(result);
+    });
   } finally {
     // client.close()
   }
